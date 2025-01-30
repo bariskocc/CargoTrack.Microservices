@@ -55,7 +55,7 @@ namespace CargoTrack.Services.Identity.API.Application.Queries
                     LastModifiedDate = user.LastModifiedDate,
                     LastLoginDate = user.LastLoginDate,
                     Roles = roles.Select(r => r.ToString()).ToList(),
-                    Permissions = permissions
+                    Permissions = permissions.ToList()
                 });
             }
 

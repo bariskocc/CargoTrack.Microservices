@@ -3,10 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CargoTrack.Services.Identity.API", "services\identity\CargoTrack.Services.Identity.API\CargoTrack.Services.Identity.API.csproj", "{10DAD2C9-41B8-4EB5-B08D-45B166E5BFDA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{10DAD2C9-41B8-4EB5-B08D-45B166E5BFDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{10DAD2C9-41B8-4EB5-B08D-45B166E5BFDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{10DAD2C9-41B8-4EB5-B08D-45B166E5BFDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{10DAD2C9-41B8-4EB5-B08D-45B166E5BFDA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
