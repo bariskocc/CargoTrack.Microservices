@@ -5,6 +5,26 @@ namespace CargoTrack.Services.Identity.API.Domain.Entities
 {
     public class User : BaseEntity
     {
+        private const int MaxFailedLoginAttempts = 5;
+        private const int LockoutDurationMinutes = 30;
+
+        public User() : base()
+        {
+            Roles = new HashSet<Role>();
+            IsActive = true;
+        }
+
+        public User(string email, string username, string passwordHash, string firstName, string lastName, string companyName, string phoneNumber) : this()
+        {
+            Email = email;
+            Username = username;
+            PasswordHash = passwordHash;
+            FirstName = firstName;
+            LastName = lastName;
+            CompanyName = companyName;
+            PhoneNumber = phoneNumber;
+        }
+
         public string Email { get; private set; }
         public string Username { get; private set; }
         public string PasswordHash { get; private set; }
@@ -18,39 +38,45 @@ namespace CargoTrack.Services.Identity.API.Domain.Entities
         public DateTime? LastLoginDate { get; private set; }
         public int FailedLoginAttempts { get; private set; }
         public DateTime? LockoutEnd { get; private set; }
-        public ICollection<UserRole> UserRoles { get; private set; }
 
-        private User() { } // For EF Core
-
-        public User(string email, string username, string passwordHash, string firstName, string lastName, 
-            string companyName, string phoneNumber)
-        {
-            Email = email ?? throw new ArgumentNullException(nameof(email));
-            Username = username ?? throw new ArgumentNullException(nameof(username));
-            PasswordHash = passwordHash ?? throw new ArgumentNullException(nameof(passwordHash));
-            FirstName = firstName ?? throw new ArgumentNullException(nameof(firstName));
-            LastName = lastName ?? throw new ArgumentNullException(nameof(lastName));
-            CompanyName = companyName ?? throw new ArgumentNullException(nameof(companyName));
-            PhoneNumber = phoneNumber;
-            IsActive = true;
-            EmailConfirmed = false;
-            PhoneNumberConfirmed = false;
-            FailedLoginAttempts = 0;
-            UserRoles = new List<UserRole>();
-        }
+        public virtual ICollection<Role> Roles { get; private set; }
 
         public void UpdateProfile(string firstName, string lastName, string companyName, string phoneNumber)
         {
-            FirstName = firstName ?? throw new ArgumentNullException(nameof(firstName));
-            LastName = lastName ?? throw new ArgumentNullException(nameof(lastName));
-            CompanyName = companyName ?? throw new ArgumentNullException(nameof(companyName));
+            FirstName = firstName;
+            LastName = lastName;
+            CompanyName = companyName;
             PhoneNumber = phoneNumber;
             MarkAsModified();
         }
 
         public void ChangePassword(string newPasswordHash)
         {
-            PasswordHash = newPasswordHash ?? throw new ArgumentNullException(nameof(newPasswordHash));
+            PasswordHash = newPasswordHash;
+            MarkAsModified();
+        }
+
+        public void AddRole(Role role)
+        {
+            Roles.Add(role);
+            MarkAsModified();
+        }
+
+        public void RemoveRole(Role role)
+        {
+            Roles.Remove(role);
+            MarkAsModified();
+        }
+
+        public void ClearRoles()
+        {
+            Roles.Clear();
+            MarkAsModified();
+        }
+
+        public void SetActive(bool isActive)
+        {
+            IsActive = isActive;
             MarkAsModified();
         }
 
@@ -66,18 +92,6 @@ namespace CargoTrack.Services.Identity.API.Domain.Entities
             MarkAsModified();
         }
 
-        public void Deactivate()
-        {
-            IsActive = false;
-            MarkAsModified();
-        }
-
-        public void Activate()
-        {
-            IsActive = true;
-            MarkAsModified();
-        }
-
         public void RecordLoginSuccess()
         {
             LastLoginDate = DateTime.UtcNow;
@@ -89,29 +103,16 @@ namespace CargoTrack.Services.Identity.API.Domain.Entities
         public void RecordLoginFailure()
         {
             FailedLoginAttempts++;
-            if (FailedLoginAttempts >= 5)
+            if (FailedLoginAttempts >= MaxFailedLoginAttempts)
             {
-                LockoutEnd = DateTime.UtcNow.AddMinutes(30);
+                LockoutEnd = DateTime.UtcNow.AddMinutes(LockoutDurationMinutes);
             }
             MarkAsModified();
         }
 
-        public void AddRole(Role role)
+        public bool IsLockedOut()
         {
-            UserRoles ??= new List<UserRole>();
-            UserRoles.Add(new UserRole(this, role));
-            MarkAsModified();
-        }
-
-        public void RemoveRole(Role role)
-        {
-            if (UserRoles == null) return;
-            var userRole = UserRoles.FirstOrDefault(ur => ur.RoleId == role.Id);
-            if (userRole != null)
-            {
-                UserRoles.Remove(userRole);
-                MarkAsModified();
-            }
+            return LockoutEnd.HasValue && LockoutEnd.Value > DateTime.UtcNow;
         }
     }
 } 

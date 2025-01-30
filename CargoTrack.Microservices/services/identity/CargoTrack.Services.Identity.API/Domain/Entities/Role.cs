@@ -5,44 +5,47 @@ namespace CargoTrack.Services.Identity.API.Domain.Entities
 {
     public class Role : BaseEntity
     {
-        public string Name { get; private set; }
-        public string Description { get; private set; }
-        public ICollection<UserRole> UserRoles { get; private set; }
-        public ICollection<RolePermission> RolePermissions { get; private set; }
-
-        private Role() { } // For EF Core
-
-        public Role(string name, string description)
+        public Role() : base()
         {
-            Name = name ?? throw new ArgumentNullException(nameof(name));
-            Description = description;
-            UserRoles = new List<UserRole>();
-            RolePermissions = new List<RolePermission>();
+            Users = new HashSet<User>();
+            Permissions = new HashSet<Permission>();
         }
 
-        public void UpdateDetails(string name, string description)
+        public Role(string name, string description = null) : this()
         {
-            Name = name ?? throw new ArgumentNullException(nameof(name));
+            Name = name;
+            Description = description;
+        }
+
+        public string Name { get; private set; }
+        public string Description { get; private set; }
+
+        public virtual ICollection<User> Users { get; private set; }
+        public virtual ICollection<Permission> Permissions { get; private set; }
+
+        public void Update(string name, string description)
+        {
+            Name = name;
             Description = description;
             MarkAsModified();
         }
 
         public void AddPermission(Permission permission)
         {
-            RolePermissions ??= new List<RolePermission>();
-            RolePermissions.Add(new RolePermission(this, permission));
+            Permissions.Add(permission);
             MarkAsModified();
         }
 
         public void RemovePermission(Permission permission)
         {
-            if (RolePermissions == null) return;
-            var rolePermission = RolePermissions.FirstOrDefault(rp => rp.PermissionId == permission.Id);
-            if (rolePermission != null)
-            {
-                RolePermissions.Remove(rolePermission);
-                MarkAsModified();
-            }
+            Permissions.Remove(permission);
+            MarkAsModified();
+        }
+
+        public void ClearPermissions()
+        {
+            Permissions.Clear();
+            MarkAsModified();
         }
     }
 } 

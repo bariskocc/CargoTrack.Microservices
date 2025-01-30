@@ -4,18 +4,19 @@ namespace CargoTrack.Services.Identity.API.Domain.Entities
 {
     public abstract class BaseEntity
     {
-        public Guid Id { get; protected set; }
-        public DateTime CreatedDate { get; protected set; }
-        public DateTime? LastModifiedDate { get; protected set; }
-        public bool IsDeleted { get; protected set; }
-
         protected BaseEntity()
         {
             Id = Guid.NewGuid();
             CreatedDate = DateTime.UtcNow;
+            LastModifiedDate = DateTime.UtcNow;
         }
 
-        public void MarkAsModified()
+        public Guid Id { get; protected set; }
+        public DateTime CreatedDate { get; protected set; }
+        public DateTime LastModifiedDate { get; protected set; }
+        public bool IsDeleted { get; protected set; }
+
+        protected void MarkAsModified()
         {
             LastModifiedDate = DateTime.UtcNow;
         }

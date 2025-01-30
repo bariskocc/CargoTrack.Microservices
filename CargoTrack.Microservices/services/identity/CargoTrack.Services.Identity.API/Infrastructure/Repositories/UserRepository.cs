@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using CargoTrack.Services.Identity.API.Domain.Entities;
 using CargoTrack.Services.Identity.API.Domain.Interfaces;
@@ -83,19 +84,19 @@ namespace CargoTrack.Services.Identity.API.Infrastructure.Repositories
                 .ToList() ?? new List<string>();
         }
 
-        public async Task<IEnumerable<Role>> GetUsersInRoleAsync(string userId)
+        public async Task<IEnumerable<User>> GetUsersInRoleAsync(string roleId)
         {
-            var user = await _context.Users
+            return await _context.Users
                 .Include(u => u.Roles)
-                .FirstOrDefaultAsync(u => u.Id == Guid.Parse(userId));
-
-            return user?.Roles ?? new List<Role>();
+                .Where(u => u.Roles.Any(r => r.Id == Guid.Parse(roleId)))
+                .ToListAsync();
         }
 
-        public async Task AddAsync(User user)
+        public async Task<User> AddAsync(User user)
         {
             await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
+            return user;
         }
 
         public async Task UpdateAsync(User user)
@@ -106,8 +107,40 @@ namespace CargoTrack.Services.Identity.API.Infrastructure.Repositories
 
         public async Task DeleteAsync(User user)
         {
-            _context.Users.Remove(user);
+            user.Delete();
+            _context.Users.Update(user);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> HasPermissionAsync(Guid userId, string permission)
+        {
+            var user = await _context.Users
+                .Include(u => u.Roles)
+                .ThenInclude(r => r.Permissions)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            return user?.Roles
+                .SelectMany(r => r.Permissions)
+                .Any(p => p.Name == permission) ?? false;
+        }
+
+        public async Task<IEnumerable<User>> FindAsync(Expression<Func<User, bool>> predicate)
+        {
+            return await _context.Users
+                .Include(u => u.Roles)
+                .ThenInclude(r => r.Permissions)
+                .Where(predicate)
+                .ToListAsync();
+        }
+
+        public async Task<bool> ExistsAsync(Expression<Func<User, bool>> predicate)
+        {
+            return await _context.Users.AnyAsync(predicate);
+        }
+
+        public async Task<int> CountAsync(Expression<Func<User, bool>> predicate)
+        {
+            return await _context.Users.CountAsync(predicate);
         }
     }
 } 

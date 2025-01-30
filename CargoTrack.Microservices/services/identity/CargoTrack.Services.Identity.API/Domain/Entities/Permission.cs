@@ -5,28 +5,32 @@ namespace CargoTrack.Services.Identity.API.Domain.Entities
 {
     public class Permission : BaseEntity
     {
-        public string Name { get; private set; }
-        public string Description { get; private set; }
-        public string SystemName { get; private set; }
-        public string Category { get; private set; }
-        public ICollection<RolePermission> RolePermissions { get; private set; }
-
-        private Permission() { } // For EF Core
-
-        public Permission(string name, string description, string systemName, string category)
+        public Permission() : base()
         {
-            Name = name ?? throw new ArgumentNullException(nameof(name));
-            Description = description;
-            SystemName = systemName ?? throw new ArgumentNullException(nameof(systemName));
-            Category = category ?? throw new ArgumentNullException(nameof(category));
-            RolePermissions = new List<RolePermission>();
+            Roles = new HashSet<Role>();
         }
 
-        public void UpdateDetails(string name, string description, string category)
+        public Permission(string name, string systemName, string description = null, string category = null) : this()
         {
-            Name = name ?? throw new ArgumentNullException(nameof(name));
+            Name = name;
+            SystemName = systemName;
             Description = description;
-            Category = category ?? throw new ArgumentNullException(nameof(category));
+            Category = category;
+        }
+
+        public string Name { get; private set; }
+        public string SystemName { get; private set; }
+        public string Description { get; private set; }
+        public string Category { get; private set; }
+
+        public virtual ICollection<Role> Roles { get; private set; }
+
+        public void Update(string name, string systemName, string description, string category)
+        {
+            Name = name;
+            SystemName = systemName;
+            Description = description;
+            Category = category;
             MarkAsModified();
         }
     }

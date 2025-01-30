@@ -37,7 +37,7 @@ namespace CargoTrack.Services.Identity.API.Application.Commands
             if (role.Name != request.RoleDto.Name && await _roleRepository.IsNameUniqueAsync(request.RoleDto.Name) == false)
                 throw new Exception("Bu rol adı zaten kullanımda.");
 
-            role.UpdateDetails(request.RoleDto.Name, request.RoleDto.Description);
+            role.Update(request.RoleDto.Name, request.RoleDto.Description);
             await _roleRepository.UpdateAsync(role);
 
             var permissions = await _roleRepository.GetRolePermissionsAsync(role.Id);
