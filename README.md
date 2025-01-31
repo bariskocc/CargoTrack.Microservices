@@ -16,7 +16,7 @@ CargoTrack, modern teknolojiler kullanılarak geliştirilmiş, B2B odaklı bir k
 ## 🛠️ Teknolojiler
 
 ### Backend
-- .NET 9
+- .NET 8
 - Entity Framework Core
 - MediatR (CQRS)
 - AutoMapper
