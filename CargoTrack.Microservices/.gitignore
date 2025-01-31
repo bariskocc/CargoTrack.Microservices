@@ -82,7 +82,6 @@ pids
 .env.production.local
 
 # Documentation
-MRD.md
 *.md
 !README.md
 
@@ -130,14 +129,29 @@ coverage/
 *.bak
 
 # Sensitive data
+appsettings.json
 appsettings.*.json
-!appsettings.json
 !appsettings.Example.json
 
-# Certificates
+# Certificates and Keys
 *.pfx
 *.p12
 *.key
 *.crt
 *.cer
-*.pem 
+*.pem
+*.jks
+*.keystore
+*.truststore
+
+# User Secrets
+*.usersecrets.json
+secrets.json
+**/secrets/
+
+# Local development settings
+launchSettings.json
+Properties/launchSettings.json
+
+# Docker Compose override
+docker-compose.override.yml 

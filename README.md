@@ -54,7 +54,8 @@ CargoTrack, modern teknolojiler kullanılarak geliştirilmiş, B2B odaklı bir k
 
 ### Kurulum
 
-1. Repoyu klonlayın
+
+1. Repoyu klonlayın ve ilk olarak kendi appsettings.json dosyanızı oluşturun.
 ```bash
 git clone https://github.com/yourusername/CargoTrack.Microservices.git
 ```

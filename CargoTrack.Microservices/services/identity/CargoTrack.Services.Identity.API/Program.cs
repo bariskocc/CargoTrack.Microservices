@@ -13,26 +13,45 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration; // Gereksiz tekrarları önlemek için tanımlandı
 
-// Add services to the container.
-builder.Services.AddControllers();
+// Add services to the container
+builder.Services.AddControllers(); // Tüm controller'ları otomatik olarak ekle
 
 // DbContext
 builder.Services.AddDbContext<IdentityDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
 
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Swagger Configuration
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "CargoTrack Identity API", Version = "v1" });
-    
-    // JWT Authentication için Swagger yapılandırması
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "CargoTrack Identity API",
+        Version = "v1",
+        Description = "CargoTrack Identity Service API Documentation",
+        Contact = new OpenApiContact
+        {
+            Name = "CargoTrack Team",
+            Email = "support@cargotrack.com"
+        }
+    });
+
+    // XML Dokümantasyonu ekleme (Swagger çökmesini önlemek için kontrol ekledim)
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        c.IncludeXmlComments(xmlPath);
+    }
+
+    // JWT Authentication for Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
@@ -66,6 +85,12 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<CreateUserDtoValidator>();
 
 // JWT Authentication
+var jwtKey = configuration["Jwt:Key"];
+if (string.IsNullOrWhiteSpace(jwtKey) || Encoding.UTF8.GetBytes(jwtKey).Length < 32)
+{
+    throw new Exception("JWT Secret Key must be at least 32 characters long.");
+}
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -75,20 +100,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+            ValidIssuer = configuration["Jwt:Issuer"],
+            ValidAudience = configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
         };
     });
 
-// CORS Policy
+// CORS Policy (Daha esnek hale getirildi)
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
-        builder =>
+        policy =>
         {
-            builder
-                .AllowAnyOrigin()
+            policy
+                .AllowAnyOrigin() // Herkese açık hale getirildi
                 .AllowAnyMethod()
                 .AllowAnyHeader();
         });
@@ -96,20 +121,21 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// Middleware Configuration
+if (app.Environment.IsDevelopment() || app.Environment.IsStaging()) // Staging için de Swagger açıldı
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "CargoTrack Identity API v1");
+        c.RoutePrefix = "swagger"; // Swagger'ı direkt ana URL'de açmak için
+    });
 }
 
 app.UseHttpsRedirection();
-
 app.UseCors("AllowAll");
-
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.Run();
