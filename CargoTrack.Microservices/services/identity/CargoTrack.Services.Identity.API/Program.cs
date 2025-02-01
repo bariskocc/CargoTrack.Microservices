@@ -11,6 +11,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using CargoTrack.Services.Identity.API.Infrastructure.Middlewares;
+using CargoTrack.Services.Identity.API.Application.Behaviors;
+using CargoTrack.Services.Identity.API.Domain.Services;
+using CargoTrack.Services.Identity.API.Infrastructure.Services;
+using CargoTrack.Services.Identity.API.Domain.Events;
+using CargoTrack.Services.Identity.API.Application.EventHandlers;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration; // Gereksiz tekrarları önlemek için tanımlandı
@@ -26,6 +32,15 @@ builder.Services.AddDbContext<IdentityDbContext>(options =>
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
+
+// Domain Services
+builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+builder.Services.AddScoped<IEmailSender, EmailSender>();
+
+// Event Handlers
+builder.Services.AddScoped<IDomainEventHandler<UserCreatedEvent>, UserCreatedEventHandler>();
+builder.Services.AddScoped<IDomainEventHandler<UserLockedOutEvent>, UserLockedOutEventHandler>();
+builder.Services.AddScoped<IDomainEventHandler<UserRolesUpdatedEvent>, UserRolesUpdatedEventHandler>();
 
 // Swagger Configuration
 builder.Services.AddEndpointsApiExplorer();
@@ -43,7 +58,19 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 
-    // XML Dokümantasyonu ekleme (Swagger çökmesini önlemek için kontrol ekledim)
+    // Controller'ları gruplandır
+    c.TagActionsBy(api =>
+    {
+        if (api.GroupName != null)
+            return new[] { api.GroupName };
+
+        var controllerName = api.ActionDescriptor.RouteValues["controller"];
+        return new[] { controllerName };
+    });
+
+    c.DocInclusionPredicate((docName, api) => true);
+
+    // XML Dokümantasyonu ekleme
     var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     if (File.Exists(xmlPath))
@@ -75,10 +102,19 @@ builder.Services.AddSwaggerGen(c =>
             Array.Empty<string>()
         }
     });
+
+    // Swagger UI'ı özelleştir
+    c.EnableAnnotations();
+    c.UseInlineDefinitionsForEnums();
+    c.DescribeAllParametersInCamelCase();
 });
 
 // MediatR
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateUserCommand).Assembly));
+builder.Services.AddMediatR(cfg => {
+    cfg.RegisterServicesFromAssembly(typeof(CreateUserCommand).Assembly);
+    cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+    cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+});
 
 // FluentValidation
 builder.Services.AddFluentValidationAutoValidation();
@@ -121,16 +157,15 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Middleware Configuration
-if (app.Environment.IsDevelopment() || app.Environment.IsStaging()) // Staging için de Swagger açıldı
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "CargoTrack Identity API v1");
-        c.RoutePrefix = "swagger"; // Swagger'ı direkt ana URL'de açmak için
-    });
+    app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<RequestPerformanceMiddleware>();
 
 app.UseHttpsRedirection();
 app.UseCors("AllowAll");

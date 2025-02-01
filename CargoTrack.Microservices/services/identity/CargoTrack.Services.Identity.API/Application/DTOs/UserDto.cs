@@ -54,4 +54,20 @@ namespace CargoTrack.Services.Identity.API.Application.DTOs
         public string NewPassword { get; set; }
         public string ConfirmNewPassword { get; set; }
     }
+
+    public class UpdateUserRolesDto
+    {
+        public ICollection<string> Roles { get; set; }
+    }
+
+    public class UpdateUserStatusDto
+    {
+        public bool IsActive { get; set; }
+    }
+
+    public class SearchUsersDto
+    {
+        public string SearchTerm { get; set; }
+        public bool IncludeInactive { get; set; }
+    }
 } 
