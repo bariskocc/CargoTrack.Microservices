@@ -3,7 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CargoTrack.Services.Identity.API", "services\identity\CargoTrack.Services.Identity.API\CargoTrack.Services.Identity.API.csproj", "{10DAD2C9-41B8-4EB5-B08D-45B166E5BFDA}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "services", "services", "{02277A82-DAAE-4F3F-9727-F9C4BAE5D297}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "identity", "identity", "{2214379B-E700-4DF5-B5E7-C2BEC11A7FFA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CargoTrack.Services.Identity.API", "CargoTrack.Services.Identity.API", "{E8395715-13F1-472B-B6CE-D79CDD721F1F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CargoTrack.Services.Identity.API", "services\identity\CargoTrack.Services.Identity.API\CargoTrack.Services.Identity.API.csproj", "{DD48DB40-90DB-41AB-9A13-85A502DA566B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CargoTrack.Services.Identity.API.Tests", "CargoTrack.Services.Identity.API.Tests", "{07D42F61-9C1A-44B3-98C9-74F1AC432DEB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{13483900-335A-46FB-BFB9-17280EC5CA07}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CargoTrack.Services.Identity.API.Tests", "tests\CargoTrack.Services.Identity.API.Tests\CargoTrack.Services.Identity.API.Tests.csproj", "{4CBD105D-4F1D-4500-BB71-310CF76F6822}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,12 +23,26 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{10DAD2C9-41B8-4EB5-B08D-45B166E5BFDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{10DAD2C9-41B8-4EB5-B08D-45B166E5BFDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{10DAD2C9-41B8-4EB5-B08D-45B166E5BFDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{10DAD2C9-41B8-4EB5-B08D-45B166E5BFDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD48DB40-90DB-41AB-9A13-85A502DA566B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD48DB40-90DB-41AB-9A13-85A502DA566B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD48DB40-90DB-41AB-9A13-85A502DA566B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD48DB40-90DB-41AB-9A13-85A502DA566B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CBD105D-4F1D-4500-BB71-310CF76F6822}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CBD105D-4F1D-4500-BB71-310CF76F6822}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CBD105D-4F1D-4500-BB71-310CF76F6822}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CBD105D-4F1D-4500-BB71-310CF76F6822}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2214379B-E700-4DF5-B5E7-C2BEC11A7FFA} = {02277A82-DAAE-4F3F-9727-F9C4BAE5D297}
+		{E8395715-13F1-472B-B6CE-D79CDD721F1F} = {2214379B-E700-4DF5-B5E7-C2BEC11A7FFA}
+		{DD48DB40-90DB-41AB-9A13-85A502DA566B} = {E8395715-13F1-472B-B6CE-D79CDD721F1F}
+		{07D42F61-9C1A-44B3-98C9-74F1AC432DEB} = {13483900-335A-46FB-BFB9-17280EC5CA07}
+		{4CBD105D-4F1D-4500-BB71-310CF76F6822} = {07D42F61-9C1A-44B3-98C9-74F1AC432DEB}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {36F9270C-A48C-4695-8649-6710F81D38D2}
 	EndGlobalSection
 EndGlobal
