@@ -1,7 +1,7 @@
 # CargoTrack Mikroservis Projesi
 
 ## 🚀 Proje Hakkında
-CargoTrack, modern teknolojiler kullanılarak geliştirilmiş, B2B odaklı bir kargo takip sistemidir. Domain-Driven Design (DDD) prensipleri ve mikroservis mimarisi üzerine inşa edilmiştir.
+CargoTrack, modern teknolojiler kullanılarak geliştirilmiş, B2B odaklı bir kargo takip sistemidir. Domain-Driven Design (DDD) prensipleri ve CQRS design pattern ile mikroservis mimarisi üzerine inşa edilmiştir.
 
 ## 🏗️ Sistem Mimarisi
 
