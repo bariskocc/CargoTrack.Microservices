@@ -46,14 +46,13 @@ CargoTrack, modern teknolojiler kullanılarak geliştirilmiş, B2B odaklı bir k
 ## 🚀 Başlangıç
 
 ### Gereksinimler
-- .NET 9 SDK
+- .NET 8 SDK
 - Docker Desktop
 - PostgreSQL
 - MongoDB
 - Redis
 
 ### Kurulum
-
 
 1. Repoyu klonlayın ve ilk olarak kendi appsettings.json dosyanızı oluşturun.
 ```bash
@@ -118,10 +117,3 @@ kubectl apply -f k8s/
 3. Commit'leyin (`git commit -m 'feat: Add amazing feature'`)
 4. Push'layın (`git push origin feature/amazing-feature`)
 5. Pull Request oluşturun
-
-## 📝 Lisans
-Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakın.
-
-## 📞 İletişim
-- Email: your.email@example.com
-- Project Link: https://github.com/yourusername/CargoTrack.Microservices 
