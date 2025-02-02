@@ -1,0 +1,6 @@
+@CargoTrack.Services.Notification.API_HostAddress = http://localhost:5027
+
+GET {{CargoTrack.Services.Notification.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
